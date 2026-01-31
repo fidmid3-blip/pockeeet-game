@@ -3,66 +3,340 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pockeeet Monster Game</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>PocketsMonster - Ежедневные награды</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: rgba(25, 25, 35, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #ff6b6b 0%, #ffa36c 100%);
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header h2 {
+            font-size: 20px;
+            margin-top: 10px;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: rgba(40, 40, 60, 0.7);
+            border-bottom: 1px solid #333;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4ecdc4;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        
+        .rewards-list {
+            padding: 20px;
+        }
+        
+        .reward-day {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            background: rgba(50, 50, 70, 0.5);
+            border-radius: 12px;
+            border-left: 5px solid #ff6b6b;
+            transition: all 0.3s ease;
+        }
+        
+        .reward-day:hover {
+            background: rgba(60, 60, 80, 0.7);
+            transform: translateX(5px);
+        }
+        
+        .reward-day.completed {
+            border-left-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.1);
+        }
+        
+        .reward-day.current {
+            border-left-color: #ffd166;
+            background: rgba(255, 209, 102, 0.1);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 209, 102, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 209, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 209, 102, 0); }
+        }
+        
+        .day-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .day-checkbox {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        
+        .day-checkbox.completed {
+            background: #4ecdc4;
+        }
+        
+        .day-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .reward-amount {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffd166;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .emoji {
+            font-size: 22px;
+        }
+        
+        .hero-reward {
+            color: #ff6b6b;
+        }
+        
+        .footer {
+            padding: 25px;
+            text-align: center;
+            background: rgba(30, 30, 50, 0.8);
+            border-top: 1px solid #333;
+        }
+        
+        .timer {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #4ecdc4;
+        }
+        
+        .timer span {
+            font-weight: 700;
+            font-size: 20px;
+            letter-spacing: 1px;
+        }
+        
+        .bot-name {
+            font-size: 16px;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+        
+        .highlight {
+            color: #ffd166;
+            font-weight: 700;
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 { font-size: 24px; }
+            .header h2 { font-size: 18px; }
+            .reward-day { padding: 12px 15px; }
+            .day-text { font-size: 16px; }
+            .reward-amount { font-size: 18px; }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>🐲 Pockeeet Monster</h1>
-        <p>Добро пожаловать в игру! Лови монстров, собирай коллекцию!</p>
-        
-        <div class="player-info">
-            <div class="coins">💰 Монеты: <span id="coins">100</span></div>
-            <div class="gems">💎 Кристаллы: <span id="gems">10</span></div>
-            <div class="free-spins">🎰 Бесплатные гачи: <span id="freeGachaCount">0</span></div>
+        <div class="header">
+            <h1>PocketsMonster</h1>
+            <h2>Ежедневные награды</h2>
         </div>
         
-        <div class="daily-rewards-section">
-            <h2><i class="fas fa-calendar-day"></i> Ежедневные награды</h2>
-            
-            <div class="streak-info">
-                <div class="streak-count">
-                    <i class="fas fa-fire"></i>
-                    <span id="currentStreak">0</span> дней подряд
-                </div>
-                <div class="total-days">
-                    <i class="fas fa-history"></i>
-                    Всего получено: <span id="totalDays">0</span> дней
-                </div>
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value">1</div>
+                <div class="stat-label">дней подряд</div>
             </div>
-            
-            <div class="rewards-calendar" id="rewardsCalendar"></div>
-            
-            <div class="daily-actions">
-                <button id="claimRewardBtn" class="claim-btn" onclick="claimDailyReward()">
-                    <i class="fas fa-gift"></i> Получить сегодняшнюю награду
-                </button>
-                <div id="claimStatus" class="status-message">
-                    Готово к получению!
-                </div>
-            </div>
-            
-            <div class="next-reset">
-                <i class="fas fa-clock"></i>
-                Следующая награда через: <span id="nextResetTimer">23:59:59</span>
+            <div class="stat-item">
+                <div class="stat-value">1</div>
+                <div class="stat-label">всего получено</div>
             </div>
         </div>
         
-        <div class="buttons">
-            <button onclick="openGacha()" class="gacha-btn">
-                🎁 Крутить монстра (10 монет)
-            </button>
-            <button onclick="openCollection()" class="collection-btn">
-                📖 Коллекция
-            </button>
+        <div class="rewards-list">
+            <div class="reward-day completed">
+                <div class="day-info">
+                    <div class="day-checkbox completed">✓</div>
+                    <div class="day-text">День 1</div>
+                </div>
+                <div class="reward-amount">50 <span class="emoji">🎉</span></div>
+            </div>
+            
+            <div class="reward-day current">
+                <div class="day-info">
+                    <div class="day-checkbox">2</div>
+                    <div class="day-text">День 2</div>
+                </div>
+                <div class="reward-amount">70 <span class="emoji">🎉</span></div>
+            </div>
+            
+            <div class="reward-day">
+                <div class="day-info">
+                    <div class="day-checkbox">3</div>
+                    <div class="day-text">День 3</div>
+                </div>
+                <div class="reward-amount">90 <span class="emoji">🎉</span></div>
+            </div>
+            
+            <div class="reward-day">
+                <div class="day-info">
+                    <div class="day-checkbox">4</div>
+                    <div class="day-text">День 4</div>
+                </div>
+                <div class="reward-amount">110 <span class="emoji">🎉</span></div>
+            </div>
+            
+            <div class="reward-day">
+                <div class="day-info">
+                    <div class="day-checkbox">5</div>
+                    <div class="day-text">День 5</div>
+                </div>
+                <div class="reward-amount">130 <span class="emoji">🎉</span></div>
+            </div>
+            
+            <div class="reward-day">
+                <div class="day-info">
+                    <div class="day-checkbox">6</div>
+                    <div class="day-text">День 6</div>
+                </div>
+                <div class="reward-amount">150 <span class="emoji">🎉</span></div>
+            </div>
+            
+            <div class="reward-day">
+                <div class="day-info">
+                    <div class="day-checkbox">7</div>
+                    <div class="day-text">День 7</div>
+                </div>
+                <div class="reward-amount">
+                    200 <span class="emoji">🎉</span> 
+                    <span class="hero-reward">+ герой</span>
+                </div>
+            </div>
         </div>
         
-        <div id="result" class="result-box">
-            🎮 Нажмите "Крутить монстра" чтобы начать!
+        <div class="footer">
+            <div class="timer">
+                Ждите до завтра (05:45)<br>
+                Уже получено сегодня! Следующая через: <span id="countdown">05:45:18</span>
+            </div>
+            <div class="bot-name">@PockeetMonsterBot</div>
+            <div class="project-id">ID проекта: <span class="highlight">PMB-2024-001</span></div>
         </div>
     </div>
-    
-    <script src="script.js"></script>
+
+    <script>
+        // Таймер обратного отсчета
+        function updateCountdown() {
+            const countdownElement = document.getElementById('countdown');
+            let time = countdownElement.textContent;
+            let parts = time.split(':');
+            let hours = parseInt(parts[0]);
+            let minutes = parseInt(parts[1]);
+            let seconds = parseInt(parts[2]);
+            
+            // Уменьшаем секунды
+            seconds--;
+            
+            if (seconds < 0) {
+                seconds = 59;
+                minutes--;
+                
+                if (minutes < 0) {
+                    minutes = 59;
+                    hours--;
+                    
+                    if (hours < 0) {
+                        hours = 0;
+                        minutes = 0;
+                        seconds = 0;
+                    }
+                }
+            }
+            
+            // Форматируем время
+            const formattedTime = 
+                String(hours).padStart(2, '0') + ':' + 
+                String(minutes).padStart(2, '0') + ':' + 
+                String(seconds).padStart(2, '0');
+            
+            countdownElement.textContent = formattedTime;
+        }
+        
+        // Обновляем таймер каждую секунду
+        setInterval(updateCountdown, 1000);
+        
+        // Добавляем интерактивность дням
+        document.querySelectorAll('.reward-day').forEach(day => {
+            day.addEventListener('click', function() {
+                if (!this.classList.contains('completed') && !this.classList.contains('current')) {
+                    alert('Эта награда будет доступна в следующий день!');
+                } else if (this.classList.contains('current')) {
+                    alert('Вы можете получить эту награду сейчас!');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
