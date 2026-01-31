@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pockeeet Monster Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🐲 Pockeeet Monster</h1>
+        <p>Добро пожаловать в игру! Лови монстров, собирай коллекцию!</p>
+        
+        <div class="player-info">
+            <div class="coins">💰 Монеты: <span id="coins">100</span></div>
+            <div class="gems">💎 Кристаллы: <span id="gems">10</span></div>
+        </div>
+        
+        <div class="buttons">
+            <button onclick="openGacha()" class="gacha-btn">
+                🎁 Крутить монстра
+            </button>
+            <button onclick="openCollection()" class="collection-btn">
+                📖 Коллекция
+            </button>
+        </div>
+        
+        <div id="result" class="result-box">
+            🎮 Нажмите "Крутить монстра" чтобы начать!
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
