@@ -3,13 +3,13 @@
 // ====================
 
 const DAILY_REWARDS = [
-    { day: 1, coins: 100, gachaSpins: 1, items: [], message: "Добро пожаловать! 🎉" },
-    { day: 2, coins: 150, gachaSpins: 1, items: ["energy_potion_small"], message: "Маленькое зелье энергии! ⚡" },
-    { day: 3, coins: 200, gachaSpins: 2, items: [], message: "Двойные гачи! 🎰" },
-    { day: 4, coins: 250, gachaSpins: 2, items: ["energy_potion_medium"], message: "Среднее зелье! 🧪" },
-    { day: 5, coins: 300, gachaSpins: 3, items: ["random_common_hero"], message: "Случайный герой! 🦸" },
-    { day: 6, coins: 400, gachaSpins: 3, items: ["crystals_small"], message: "Первые кристаллы! 💎" },
-    { day: 7, coins: 500, gachaSpins: 5, items: ["random_rare_hero"], message: "Редкий герой! 🏆 Бонус x2!" }
+    { day: 1, coins: 50, gachaSpins: 1, items: [], message: "Добро пожаловать! 🎉" },
+    { day: 2, coins: 70, gachaSpins: 1, items: [], message: "Продолжаем! ⚡" },
+    { day: 3, coins: 90, gachaSpins: 1, items: [], message: "День 3! 🎰" },
+    { day: 4, coins: 110, gachaSpins: 1, items: [], message: "Уже половина недели! 🧪" },
+    { day: 5, coins: 130, gachaSpins: 1, items: [], message: "Почти у цели! 🦸" },
+    { day: 6, coins: 150, gachaSpins: 1, items: [], message: "Завтра большой приз! 💎" },
+    { day: 7, coins: 200, gachaSpins: 2, items: ["random_common_hero"], message: "Неделя завершена! + герой! 🏆" }
 ];
 
 class DailyRewardSystem {
@@ -75,11 +75,11 @@ class DailyRewardSystem {
         const reward = DAILY_REWARDS.find(r => r.day === cycleDay);
         
         let bonusMultiplier = 1;
-        if (this.streak >= 7) bonusMultiplier = 2;
-        if (this.streak >= 14) bonusMultiplier = 3;
+        if (this.streak >= 7) bonusMultiplier = 1.2;
+        if (this.streak >= 14) bonusMultiplier = 1.5;
         
-        const coinsEarned = reward.coins * bonusMultiplier;
-        const spinsEarned = reward.gachaSpins * bonusMultiplier;
+        const coinsEarned = Math.round(reward.coins * bonusMultiplier);
+        const spinsEarned = Math.round(reward.gachaSpins * bonusMultiplier);
         
         playerData.coins += coinsEarned;
         if (!playerData.freeGachaSpins) playerData.freeGachaSpins = 0;
@@ -96,7 +96,7 @@ class DailyRewardSystem {
                 coins: coinsEarned,
                 spins: spinsEarned,
                 items: reward.items,
-                message: reward.message + (bonusMultiplier > 1 ? ` (x${bonusMultiplier} бонус!)` : "")
+                message: reward.message + (bonusMultiplier > 1 ? ` (+${Math.round((bonusMultiplier-1)*100)}% бонус)` : "")
             },
             message: `🎉 День ${this.streak}! Получено: ${coinsEarned} монет, ${spinsEarned} гач`
         };
@@ -177,8 +177,8 @@ class DailyRewardSystem {
             }
             
             let bonusText = '';
-            if (this.streak >= 7 && i === currentCycleDay) bonusText = ' x2';
-            if (this.streak >= 14 && i === currentCycleDay) bonusText = ' x3';
+            if (this.streak >= 7 && i === currentCycleDay) bonusText = ' +20%';
+            if (this.streak >= 14 && i === currentCycleDay) bonusText = ' +50%';
             
             dayElement.classList.add(dayStatus);
             
@@ -187,7 +187,7 @@ class DailyRewardSystem {
                 <div class="reward-content">
                     <div class="reward-amount">${reward.coins}💰</div>
                     <div>${reward.gachaSpins}🎰${bonusText}</div>
-                    ${reward.items.length > 0 ? '<div>+ предмет</div>' : ''}
+                    ${reward.items.length > 0 ? '<div>+ герой</div>' : ''}
                 </div>
             `;
             
@@ -235,35 +235,39 @@ function claimDailyReward() {
 // ====================
 
 let playerData = {
-    coins: 100,
-    gems: 10,
+    coins: 50,
+    gems: 5,
     monsters: [],
-    freeGachaSpins: 0
+    freeGachaSpins: 0,
+    monsterCounts: {} // Счётчик каждого вида монстров
 };
 
 const monstersDatabase = [
-    { id: 1, name: "Огнедыш", rarity: "common", type: "fire", emoji: "🔥" },
-    { id: 2, name: "Водяной", rarity: "common", type: "water", emoji: "💧" },
-    { id: 3, name: "Листовик", rarity: "common", type: "grass", emoji: "🍃" },
-    { id: 4, name: "Громозуб", rarity: "rare", type: "electric", emoji: "⚡" },
-    { id: 5, name: "Ледяной дух", rarity: "rare", type: "ice", emoji: "❄️" },
-    { id: 6, name: "Каменный страж", rarity: "epic", type: "rock", emoji: "🪨" },
-    { id: 7, name: "Теневой клинок", rarity: "epic", type: "dark", emoji: "🌑" },
-    { id: 8, name: "Золотой дракон", rarity: "legendary", type: "dragon", emoji: "🐉" }
+    { id: 1, name: "Огнедыш", rarity: "common", type: "fire", emoji: "🔥", basePrice: 5 },
+    { id: 2, name: "Водяной", rarity: "common", type: "water", emoji: "💧", basePrice: 5 },
+    { id: 3, name: "Листовик", rarity: "common", type: "grass", emoji: "🍃", basePrice: 5 },
+    { id: 4, name: "Громозуб", rarity: "uncommon", type: "electric", emoji: "⚡", basePrice: 15 },
+    { id: 5, name: "Ледяной дух", rarity: "uncommon", type: "ice", emoji: "❄️", basePrice: 15 },
+    { id: 6, name: "Каменный страж", rarity: "rare", type: "rock", emoji: "🪨", basePrice: 30 },
+    { id: 7, name: "Теневой клинок", rarity: "rare", type: "dark", emoji: "🌑", basePrice: 30 },
+    { id: 8, name: "Золотой дракон", rarity: "epic", type: "dragon", emoji: "🐉", basePrice: 100 }
 ];
 
 function openGacha() {
-    if (playerData.coins < 10 && (!playerData.freeGachaSpins || playerData.freeGachaSpins <= 0)) {
-        showResult("❌ Недостаточно монет и нет бесплатных гач!");
+    const hasFreeSpins = playerData.freeGachaSpins && playerData.freeGachaSpins > 0;
+    const hasCoins = playerData.coins >= 15;
+    
+    if (!hasFreeSpins && !hasCoins) {
+        showResult("❌ Нужно 15 монет или бесплатная гача!");
         return;
     }
     
     let useFreeSpin = false;
-    if (playerData.freeGachaSpins && playerData.freeGachaSpins > 0) {
+    if (hasFreeSpins) {
         playerData.freeGachaSpins--;
         useFreeSpin = true;
     } else {
-        playerData.coins -= 10;
+        playerData.coins -= 15;
     }
     
     updateUI();
@@ -273,6 +277,12 @@ function openGacha() {
         const monster = spinGacha();
         playerData.monsters.push(monster);
         
+        // Обновляем счётчик
+        if (!playerData.monsterCounts[monster.id]) {
+            playerData.monsterCounts[monster.id] = 0;
+        }
+        playerData.monsterCounts[monster.id]++;
+        
         showResult(`
             🎉 Вы получили:
             <br><br>
@@ -281,7 +291,9 @@ function openGacha() {
             <br>
             Редкость: <span class="rarity-${monster.rarity}">${getRarityName(monster.rarity)}</span>
             <br>
-            ${useFreeSpin ? '🆓 Использована бесплатная гача!' : '💰 Потрачено 10 монет'}
+            У вас таких: ${playerData.monsterCounts[monster.id]} шт.
+            <br>
+            ${useFreeSpin ? '🆓 Использована бесплатная гача!' : '💰 Потрачено 15 монет'}
         `);
         
         saveProgress();
@@ -292,10 +304,10 @@ function spinGacha() {
     const random = Math.random() * 100;
     
     let rarity;
-    if (random < 50) rarity = "common";
-    else if (random < 80) rarity = "rare";
-    else if (random < 95) rarity = "epic";
-    else rarity = "legendary";
+    if (random < 70) rarity = "common";      // 70%
+    else if (random < 90) rarity = "uncommon"; // 20%
+    else if (random < 98) rarity = "rare";     // 8%
+    else rarity = "epic";                      // 2%
     
     const possibleMonsters = monstersDatabase.filter(m => m.rarity === rarity);
     const randomMonster = possibleMonsters[Math.floor(Math.random() * possibleMonsters.length)];
@@ -309,16 +321,46 @@ function openCollection() {
         return;
     }
     
-    let collectionHTML = "<h3>📖 Ваша коллекция:</h3><br>";
-    
-    playerData.monsters.forEach((monster) => {
-        collectionHTML += `
-            <div class="monster-item">
-                ${monster.emoji} <strong>${monster.name}</strong> 
-                (${getRarityName(monster.rarity)})
-            </div>
-        `;
+    // Считаем общее количество каждого монстра
+    const monsterStats = {};
+    playerData.monsters.forEach(monster => {
+        if (!monsterStats[monster.name]) {
+            monsterStats[monster.name] = {
+                count: 0,
+                emoji: monster.emoji,
+                rarity: monster.rarity
+            };
+        }
+        monsterStats[monster.name].count++;
     });
+    
+    let collectionHTML = `
+        <h3>📖 Ваша коллекция</h3>
+        <p>Всего монстров: <strong>${playerData.monsters.length}</strong></p>
+        <div class="collection-stats">
+    `;
+    
+    // Сортируем по редкости
+    const rarityOrder = { epic: 4, rare: 3, uncommon: 2, common: 1 };
+    
+    Object.entries(monsterStats)
+        .sort((a, b) => rarityOrder[b[1].rarity] - rarityOrder[a[1].rarity])
+        .forEach(([name, data]) => {
+            collectionHTML += `
+                <div class="monster-stat">
+                    <div class="monster-emoji">${data.emoji}</div>
+                    <div class="monster-info">
+                        <strong>${name}</strong><br>
+                        <span class="rarity-${data.rarity}">${getRarityName(data.rarity)}</span>
+                    </div>
+                    <div class="monster-count">
+                        ${data.count} шт.
+                    </div>
+                </div>
+            `;
+        });
+    
+    collectionHTML += `</div>`;
     
     showResult(collectionHTML);
 }
@@ -340,9 +382,9 @@ function updateUI() {
 function getRarityName(rarity) {
     const names = {
         common: "Обычный",
+        uncommon: "Необычный",
         rare: "Редкий",
-        epic: "Эпический",
-        legendary: "Легендарный"
+        epic: "Эпический"
     };
     return names[rarity] || rarity;
 }
@@ -355,6 +397,15 @@ function loadProgress() {
     const saved = localStorage.getItem('pockeeetMonsterData');
     if (saved) {
         playerData = JSON.parse(saved);
+        
+        // Инициализируем monsterCounts если нет
+        if (!playerData.monsterCounts) {
+            playerData.monsterCounts = {};
+            playerData.monsters.forEach(monster => {
+                playerData.monsterCounts[monster.id] = (playerData.monsterCounts[monster.id] || 0) + 1;
+            });
+        }
+        
         updateUI();
     }
     
