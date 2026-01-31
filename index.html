@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pockeeet Monster Game</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
@@ -14,11 +15,43 @@
         <div class="player-info">
             <div class="coins">💰 Монеты: <span id="coins">100</span></div>
             <div class="gems">💎 Кристаллы: <span id="gems">10</span></div>
+            <div class="free-spins">🎰 Бесплатные гачи: <span id="freeGachaCount">0</span></div>
+        </div>
+        
+        <div class="daily-rewards-section">
+            <h2><i class="fas fa-calendar-day"></i> Ежедневные награды</h2>
+            
+            <div class="streak-info">
+                <div class="streak-count">
+                    <i class="fas fa-fire"></i>
+                    <span id="currentStreak">0</span> дней подряд
+                </div>
+                <div class="total-days">
+                    <i class="fas fa-history"></i>
+                    Всего получено: <span id="totalDays">0</span> дней
+                </div>
+            </div>
+            
+            <div class="rewards-calendar" id="rewardsCalendar"></div>
+            
+            <div class="daily-actions">
+                <button id="claimRewardBtn" class="claim-btn" onclick="claimDailyReward()">
+                    <i class="fas fa-gift"></i> Получить сегодняшнюю награду
+                </button>
+                <div id="claimStatus" class="status-message">
+                    Готово к получению!
+                </div>
+            </div>
+            
+            <div class="next-reset">
+                <i class="fas fa-clock"></i>
+                Следующая награда через: <span id="nextResetTimer">23:59:59</span>
+            </div>
         </div>
         
         <div class="buttons">
             <button onclick="openGacha()" class="gacha-btn">
-                🎁 Крутить монстра
+                🎁 Крутить монстра (10 монет)
             </button>
             <button onclick="openCollection()" class="collection-btn">
                 📖 Коллекция
